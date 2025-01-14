@@ -323,10 +323,10 @@ function createTypingIndicator() {
 
 function appendMessage(sender, message, isTyping = false) {
     const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message', ${sender}-message);
+    messageDiv.classList.add('message', `${sender}-message`);
 
     const avatar = document.createElement('div');
-    avatar.classList.add('avatar', ${sender}-avatar);
+    avatar.classList.add('avatar', `${sender}-avatar`);
     avatar.textContent = sender === 'user' ? 'U' : 'A';
 
     const content = document.createElement('div');
@@ -337,7 +337,7 @@ function appendMessage(sender, message, isTyping = false) {
     } else {
         content.innerHTML = sender === 'user' ?
             message :
-            <pre class="language-javascript">${message}</pre>;
+            `<pre class="language-javascript">${message}</pre>`;
 
         if (sender === 'bot') {
             Prism.highlightElement(content.querySelector('pre'));
@@ -353,7 +353,7 @@ function appendMessage(sender, message, isTyping = false) {
 }
 
 async function typeMessage(message, element) {
-    message = message.replace(/^.*$/s, '').trim();  
+    message = message.replace(/^```.*```$/s, '').trim();  
 
     const pre = document.createElement('pre');
     pre.classList.add('language-javascript');
@@ -384,10 +384,10 @@ async function handleSendMessage() {
     try {
         const response = await getGeneratedCode(query); 
         
-        typingMessage.querySelector('.message-content').innerHTML = ''; // Clear typing indicator
+        typingMessage.querySelector('.message-content').innerHTML = '';
         await typeMessage(response, typingMessage.querySelector('.message-content'));
         
-        // Save to history
+        // Save history
         chatHistory.push({ message: query, response: response });
         updateHistoryPanel();  
     } catch (error) {
@@ -412,7 +412,7 @@ async function getGeneratedCode(query) {
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
-                'Authorization': Bearer ${apiKey},
+                'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
