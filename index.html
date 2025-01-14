@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Code Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.0/themes/prism-tomorrow.min.css" />
+    <style>
+       :root {
+    --primary-color: #3b82f6;
+    --bg-dark: #000000;
+    --bg-darker: #111111;
+    --text-light: #ffffff;
+    --text-gray: #9ca3af;
+    --border-color: #333333;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    background: var(--bg-darker);
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.app-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.chat-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    background: var(--bg-dark);
+}
+
+.message {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: messageAppear 0.5s forwards;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.user-avatar {
+    background: var(--text-gray);
+}
+
+.message-content {
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    width: auto;
+    max-width: 1200px;
+}
+
+.bot-message .message-content {
+    background: var(--bg-darker);
+    border-radius: 1rem 1rem 1rem 0;
+    width: auto; 
+    max-width: 1200px;
+    overflow-wrap: break-word; 
+    word-break: break-word; 
+    white-space: pre-wrap; 
+    border: 1px solid var(--border-color);
+}
+
+.user-message {
+    display: flex;
+    gap: 1rem;
+    flex-direction: row-reverse;
+    align-items: flex-start;
+}
+
+.user-message .message-content {
+    background: var(--primary-color);
+    color: var(--text-light);
+    border-radius: 1rem 1rem 0 1rem;
+    width: auto; 
+    max-width: 70%; 
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
+    padding: 1rem;
+}
+
+.typing-indicator {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--text-gray);
+    border-radius: 50%;
+    animation: typingAnimation 1.4s infinite;
+    opacity: 0.6;
+}
+
+.typing-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typingAnimation {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.input-container {
+    background: var(--bg-darker);
+    padding: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+}
+
+.input-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    gap: 1rem;
+}
+
+textarea {
+    flex: 1;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    background: var(--bg-dark);
+    color: var(--text-light);
+    font-size: 1rem;
+    resize: none;
+    min-height: 60px;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+button {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+pre {
+    background: var(--bg-dark) !important;
+    border-radius: 0.5rem;
+    margin-top: 0.5rem !important;
+    padding: 1rem !important;
+    border: 1px solid var(--border-color);
+    width: 100%;
+    max-width: 100%;
+    white-space: pre-wrap !important;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+}
+
+.history-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 50;
+}
+
+@keyframes messageAppear {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 1200px) {
+    .bot-message .message-content {
+        max-width: 100%;
+    }
+    .user-message .message-content {
+        max-width: 80%;
+    }
+}
+
+@media (max-width: 768px) {
+    .chat-container {
+        padding: 1rem;
+    }
+
+    .message-content {
+        max-width: 100%;
+    }
+
+    .bot-message .message-content {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .user-message .message-content {
+        max-width: 80%;
+    }
+
+    .input-wrapper {
+        flex-direction: column;
+    }
+
+    button {
+        width: 100%;
+    }
+
+    textarea {
+        min-height: 80px;
+    }
+
+    .header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="history-overlay" id="history-overlay"></div>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-content">
+                <div class="app-title">Code Assistant</div>
+            </div>
+        </header>
+        
+        <div class="chat-container" id="chat-box"></div>
+        
+        <div class="input-container">
+            <div class="input-wrapper">
+                <textarea 
+                    id="user-input" 
+                    placeholder="Ask me about coding..." 
+                    rows="2"
+                ></textarea>
+                <button id="send-btn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.0/prism.min.js"></script>
+    <script>
+    const chatBox = document.getElementById('chat-box');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+
+let chatHistory = []; 
+function createTypingIndicator() {
+    return `
+        <div class="typing-indicator">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        </div>
+    `;
+}
+
+function appendMessage(sender, message, isTyping = false) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', ${sender}-message);
+
+    const avatar = document.createElement('div');
+    avatar.classList.add('avatar', ${sender}-avatar);
+    avatar.textContent = sender === 'user' ? 'U' : 'A';
+
+    const content = document.createElement('div');
+    content.classList.add('message-content');
+
+    if (isTyping) {
+        content.innerHTML = createTypingIndicator();
+    } else {
+        content.innerHTML = sender === 'user' ?
+            message :
+            <pre class="language-javascript">${message}</pre>;
+
+        if (sender === 'bot') {
+            Prism.highlightElement(content.querySelector('pre'));
+        }
+    }
+
+    messageDiv.appendChild(avatar);
+    messageDiv.appendChild(content);
+    chatBox.appendChild(messageDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    return messageDiv;
+}
+
+async function typeMessage(message, element) {
+    message = message.replace(/^.*$/s, '').trim();  
+
+    const pre = document.createElement('pre');
+    pre.classList.add('language-javascript');
+    element.innerHTML = '';
+    element.appendChild(pre);
+    
+    let currentText = '';
+    const words = message.split(' ');
+    
+    for (let word of words) {
+        currentText += (currentText ? ' ' : '') + word;
+        pre.textContent = currentText;
+        Prism.highlightElement(pre);
+        await new Promise(resolve => setTimeout(resolve, 50));
+    }
+}
+
+async function handleSendMessage() {
+    const query = userInput.value.trim();
+    if (!query) return;
+
+    appendMessage('user', query);
+    userInput.value = '';
+    userInput.style.height = 'auto';
+
+    const typingMessage = appendMessage('bot', '', true);
+
+    try {
+        const response = await getGeneratedCode(query); 
+        
+        typingMessage.querySelector('.message-content').innerHTML = ''; 
+        await typeMessage(response, typingMessage.querySelector('.message-content'));
+        
+        chatHistory.push({ message: query, response: response });
+        updateHistoryPanel();  
+    } catch (error) {
+        typingMessage.remove();
+        appendMessage('bot', 'Sorry, I encountered an error generating the response.');
+    }
+}
+
+function updateHistoryPanel() {
+    chatBox.innerHTML = ''; 
+    chatHistory.forEach(item => {
+        appendMessage('user', item.message);
+        appendMessage('bot', item.response);
+    });
+}
+
+async function getGeneratedCode(query) {
+    const apiKey = 'JAkRw2sHmy0c6XbeoXXfAwlb3TKgZBgf7Mq0eXw4';
+    const apiUrl = 'https://api.cohere.ai/generate';
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': Bearer ${apiKey},
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                prompt: query,
+            model: 'command-xlarge',
+            max_tokens: 800, 
+            temperature: 0.5,
+            stop_sequences: ["//end"]
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('API request failed');
+        }
+
+        const result = await response.json();
+        let responseText = result.text.trim();  
+
+        responseText = responseText.replace(/^'+|'+$/g, ''); 
+
+        return responseText; 
+    } catch (error) {
+        console.error('Error:', error);
+        throw new Error('Failed to generate response');
+    }
+}
+
+sendBtn.addEventListener('click', handleSendMessage);
+
+userInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault(); 
+        handleSendMessage();
+    }
+});
+</script>
+</body>
+</html
