@@ -384,9 +384,10 @@ async function handleSendMessage() {
     try {
         const response = await getGeneratedCode(query); 
         
-        typingMessage.querySelector('.message-content').innerHTML = ''; 
+        typingMessage.querySelector('.message-content').innerHTML = ''; // Clear typing indicator
         await typeMessage(response, typingMessage.querySelector('.message-content'));
         
+        // Save to history
         chatHistory.push({ message: query, response: response });
         updateHistoryPanel();  
     } catch (error) {
@@ -449,4 +450,4 @@ userInput.addEventListener('keydown', (e) => {
 });
 </script>
 </body>
-</html
+</html>
